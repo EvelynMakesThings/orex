@@ -1,28 +1,37 @@
-name: NodeJS with Webpack
+name: CI Build
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Adjust according to your Node.js version
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build
-      run: |
-        npm install
-        npx webpack
+      - name: Install Vue.js
+        run: npm install vue
+
+      - name: Run npm audit fix
+        run: npm audit fix  # Automatically fix vulnerabilities
+
+      - name: Update Webpack to the latest version
+        run: npm install webpack@latest webpack-cli@latest --save-dev
+
+      - name: Build project with Webpack
+        run: npm run build  # This assumes you have a build script set up in package.json
+
+      - name: Deploy (optional)
+        run: |
+          echo "Deploying..."
